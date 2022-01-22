@@ -95,7 +95,7 @@ def radixSort(A, digitUpperBound, digitLowerBound, myhashLst = getDecimalHashLst
 
 
 #mycmp = lambda a: a[1]
-A = [-5,1,10,14,2,17,13,6,5,7,12,-3,-2,-1,-2,-3,0,3,2,-4,9,10,8]
+#A = [-5,1,10,14,2,17,13,6,5,7,12,-3,-2,-1,-2,-3,0,3,2,-4,9,10,8]
 #print(myCountingSort(A, 20, -5))
 
 #B = [(i, val) for i, val in enumerate(A)]
@@ -119,6 +119,19 @@ A = [-5,1,10,14,2,17,13,6,5,7,12,-3,-2,-1,-2,-3,0,3,2,-4,9,10,8]
 #print(myCountingSort([], -3, -3))
 
 
-smallest = 0
-myhashLst = getDecimalHashLst(-100)
-print(radixSort(A, 9, 0))
+#A = [-5,1,10,14,2,17,13,6,5,7,12,-3,-2,-1,-2,-3,0,3,2,-4,9,10,8]
+#myhashLst = getDecimalHashLst(-100)
+#print(radixSort(A, 9, 0, myhashLst))
+##[-5, -4, -3, -3, -2, -2, -1, 0, 1, 2, 2, 3, 5, 6, 7, 8, 9, 10, 10, 12, 13, 14, 17]
+
+
+#B = ["COW", "DOG", "SEA", "RUG", "ROW", "MOB", "BOX", "TAB", "BAR", "EAR", "TAR", "DIG", "BIG", "TEA", "NOW", "FOX"]
+#myhashLst = [lambda a, i=i: ord(a[i]) for i in range(2, -1, -1)]
+#print(radixSort(B, ord('Z'), ord('A'), myhashLst))
+##['BAR', 'BIG', 'BOX', 'COW', 'DIG', 'DOG', 'EAR', 'FOX', 'MOB', 'NOW', 'ROW', 'RUG', 'SEA', 'TAB', 'TAR', 'TEA']
+
+#C = [(5, 2), (4, 3), (6, 9), (11, 5), (2, 4), (4, 5)]
+#myhashLst = [lambda a, i=i: a[i] for i in range(1, -1, -1)]
+#print(radixSort(C, 20, 2, myhashLst))
+##[(2, 4), (4, 3), (4, 5), (5, 2), (6, 9), (11, 5)]
+
