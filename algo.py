@@ -64,8 +64,10 @@ class myHeap:
 # lowerObject is default to be 0
 # this sorting is also stable, meaning if a and b both in A, a == b, and
 # a appears before b, then in res a will also appear before b.
-def myCountingSort(A, upperObject, lowerObject = 0, myhash = lambda a: a):
-    upperBound, lowerBound = myhash(upperObject), myhash(lowerObject)
+def myCountingSort(A, upperObject, lowerObject = 0, myhash = lambda a: a, useHashForUpperAndLowerBound = True):
+    upperBound, lowerBound = upperObject, lowerObject
+    if(useHashForUpperAndLowerBound):
+        upperBound, lowerBound = myhash(upperObject), myhash(lowerObject)
     if(upperBound < lowerBound): return []
     res = [0 for i in A]
     track = [0 for i in range(upperBound - lowerBound + 1)]
@@ -79,30 +81,44 @@ def myCountingSort(A, upperObject, lowerObject = 0, myhash = lambda a: a):
         res[track[trackIndex]] = A[i]
     return res
 
+def getDecimalHashLst(smallestVal = 0, digits = 10, decimal = 10):
+    return [lambda a, i=i: ((a - smallestVal) // (decimal**i)) % decimal for i in range(digits)]
+
+# the key idea of radixSort is to create a list of hashes. The later that hash appears in the list,
+# the more significant it is and the more impact it will have for the final result. For each hash,
+# it takes O(k + n) where k is all the possible values for that hash. We have d hashes, so 
+# eventually the whole algo takes O(d(k + n)).
+def radixSort(A, digitUpperBound, digitLowerBound, myhashLst = getDecimalHashLst()):
+    for myhash in myhashLst:
+        A = myCountingSort(A, digitUpperBound, digitLowerBound, myhash, False)
+    return A
 
 
-mycmp = lambda a: a[1]
+#mycmp = lambda a: a[1]
 A = [-5,1,10,14,2,17,13,6,5,7,12,-3,-2,-1,-2,-3,0,3,2,-4,9,10,8]
-print(myCountingSort(A, 20, -5))
+#print(myCountingSort(A, 20, -5))
 
-B = [(i, val) for i, val in enumerate(A)]
-print(myCountingSort(B, (99, 20), (99, -5), mycmp))
+#B = [(i, val) for i, val in enumerate(A)]
+#print(myCountingSort(B, (99, 20), (99, -5), mycmp))
 
-B = [(99, i) for i in A]
-print(myCountingSort(B, (99, 20), (99, -5), mycmp))
+#B = [(99, i) for i in A]
+#print(myCountingSort(B, (99, 20), (99, -5), mycmp))
 
-C = [(99, 0) for i in A]
-print(myCountingSort(C, (99, 0), (99, 0), mycmp))
+#C = [(99, 0) for i in A]
+#print(myCountingSort(C, (99, 0), (99, 0), mycmp))
 
-C = [(99, -4) for i in A]
-print(myCountingSort(C, (99, -4), (99, -4), mycmp))
+#C = [(99, -4) for i in A]
+#print(myCountingSort(C, (99, -4), (99, -4), mycmp))
 
-C = [(99, 1) for i in A]
-print(myCountingSort(C, (99, 1), (99, 1), mycmp))
+#C = [(99, 1) for i in A]
+#print(myCountingSort(C, (99, 1), (99, 1), mycmp))
 
-C = [-3 for i in A]
-print(myCountingSort(C, -3, -3))
+#C = [-3 for i in A]
+#print(myCountingSort(C, -3, -3))
 
-print(myCountingSort([], -3, -3))
+#print(myCountingSort([], -3, -3))
 
-print(myCountingSort([-3], -3, -3))
+
+smallest = 0
+myhashLst = getDecimalHashLst(-100)
+print(radixSort(A, 9, 0))
