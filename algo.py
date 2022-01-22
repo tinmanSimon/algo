@@ -60,8 +60,8 @@ class myHeap:
     def size(self):
         return len(self.A)
 
-# maxVal is the upperbound of values in A.
-# lowerBound is default to be 0
+# upperObject is the upperbound object in A.
+# lowerObject is default to be 0
 def myCountingSort(A, upperObject, lowerObject = 0, myhash = lambda a: a):
     upperBound, lowerBound = myhash(upperObject), myhash(lowerObject)
     if(upperBound < lowerBound): return []
