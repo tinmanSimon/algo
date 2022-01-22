@@ -62,6 +62,8 @@ class myHeap:
 
 # upperObject is the upperbound object in A.
 # lowerObject is default to be 0
+# this sorting is also stable, meaning if a and b both in A, a == b, and
+# a appears before b, then in res a will also appear before b.
 def myCountingSort(A, upperObject, lowerObject = 0, myhash = lambda a: a):
     upperBound, lowerBound = myhash(upperObject), myhash(lowerObject)
     if(upperBound < lowerBound): return []
@@ -79,12 +81,14 @@ def myCountingSort(A, upperObject, lowerObject = 0, myhash = lambda a: a):
 
 
 
-
+mycmp = lambda a: a[1]
 A = [-5,1,10,14,2,17,13,6,5,7,12,-3,-2,-1,-2,-3,0,3,2,-4,9,10,8]
 print(myCountingSort(A, 20, -5))
 
+B = [(i, val) for i, val in enumerate(A)]
+print(myCountingSort(B, (99, 20), (99, -5), mycmp))
+
 B = [(99, i) for i in A]
-mycmp = lambda a: a[1]
 print(myCountingSort(B, (99, 20), (99, -5), mycmp))
 
 C = [(99, 0) for i in A]
