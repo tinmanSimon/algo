@@ -95,7 +95,7 @@ def radixSort(A, digitUpperBound, digitLowerBound, myhashLst = getDecimalHashLst
 
 def bucketSort(A, bucketsNum, myBucketHash, mySortHash = lambda a: a):
     res = []
-    buckets = [[] for i in range(bucketsNum)]
+    buckets = [[] for i in range(bucketsNum + 1)]
     for val in A:
         buckets[myBucketHash(val)].append(val)
     for bucket in buckets:
@@ -105,10 +105,9 @@ def bucketSort(A, bucketsNum, myBucketHash, mySortHash = lambda a: a):
     return res
 
 #A = [-5,1,10,14,2,17,13,6,5,7,12,-3,-2,-1,-2,-3,0,3,2,-4,9,10,8]
-A = [(5, 2), (4, 3), (6, 9), (11, 5), (2, 4), (4, 5)]
-myhash = lambda a: (a[1] + 10) // 3
-sorthash = lambda a: a[1]
-print(bucketSort(A, 10, myhash, sorthash))
+#A = [(5, 2), (4, 3), (6, 9), (11, 5), (2, 4), (4, 5)]
+#myhash = lambda a: (a[1] + 10) // 3
+#sorthash = lambda a: a[1]
 
 #mycmp = lambda a: a[1]
 #A = [-5,1,10,14,2,17,13,6,5,7,12,-3,-2,-1,-2,-3,0,3,2,-4,9,10,8]
