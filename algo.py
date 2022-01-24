@@ -1,3 +1,5 @@
+import random
+
 # By default this is a max heap, but you can assign mycmp method to
 # make it min heap.
 class myHeap:
@@ -59,6 +61,50 @@ class myHeap:
 
     def size(self):
         return len(self.A)
+
+def partition(A, l, h, mycmp = lambda a, b: a < b):
+    sampleIndex = random.randint(l, h - 1)
+    A[sampleIndex], A[h - 1] = A[h - 1], A[sampleIndex]
+    i = l
+    for j in range(l, h - 1):
+        if(mycmp(A[j], A[h - 1])):
+            A[i], A[j] = A[j], A[i]
+            i += 1
+    A[i], A[h - 1] = A[h - 1], A[i]
+    return i
+
+# randomized quickSort, assuming all elements are distinct
+def quickSort(A, mycmp = lambda a, b: a < b):
+    def helper(A, l, h):
+        if(l < h):
+            q = partition(A, l, h, mycmp)
+            helper(A, l, q)
+            helper(A, q + 1, h)
+    helper(A, 0, len(A))
+
+#T = [5,1,1,2,1,1,1,1,1,1,14,3,2,4,3,2,4,3,5,1,1,2,3,4,23,2,3,3,4,23,1,0,0]
+#mycmp = lambda a, b: a > b
+#quickSort(T, mycmp)
+#print(T)
+
+# expect 0 < i <= len(A)
+# selecting ith smallest number by default.
+def quickSelect(A, i, selectSmallest = True):
+    if(not selectSmallest): i = len(A) - i + 1
+    l, h = 0, len(A)
+    while(l < h):
+        q = partition(A, l, h)
+        if(q - l + 1 == i): return A[q]
+        elif(q - l + 1 > i):
+            h = q
+        else:
+            i = i - (q - l + 1)
+            l = q + 1
+
+#T = [5,1,1,2,1,1,1,1,1,1,14,3,2,4,3,2,4,3,5,1,1,2,3,4,23,2,3,3,4,23,1,0,0]
+#print(quickSelect(T, 12))
+#quickSort(T)
+#print(T)
 
 # upperObject is the upperbound object in A.
 # lowerObject is default to be 0
