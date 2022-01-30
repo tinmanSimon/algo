@@ -82,11 +82,6 @@ def quickSort(A, mycmp = lambda a, b: a < b):
             helper(A, q + 1, h)
     helper(A, 0, len(A))
 
-#T = [5,1,1,2,1,1,1,1,1,1,14,3,2,4,3,2,4,3,5,1,1,2,3,4,23,2,3,3,4,23,1,0,0]
-#mycmp = lambda a, b: a > b
-#quickSort(T, mycmp)
-#print(T)
-
 # expect 0 < i <= len(A)
 # selecting ith smallest number by default.
 def quickSelect(A, i, selectSmallest = True):
@@ -100,11 +95,6 @@ def quickSelect(A, i, selectSmallest = True):
         else:
             i = i - (q - l + 1)
             l = q + 1
-
-#T = [5,1,1,2,1,1,1,1,1,1,14,3,2,4,3,2,4,3,5,1,1,2,3,4,23,2,3,3,4,23,1,0,0]
-#print(quickSelect(T, 12))
-#quickSort(T)
-#print(T)
 
 # upperObject is the upperbound object in A.
 # lowerObject is default to be 0
@@ -150,52 +140,122 @@ def bucketSort(A, bucketsNum, myBucketHash, mySortHash = lambda a: a):
         res.extend(bucket)
     return res
 
-#A = [-5,1,10,14,2,17,13,6,5,7,12,-3,-2,-1,-2,-3,0,3,2,-4,9,10,8]
-#A = [(5, 2), (4, 3), (6, 9), (11, 5), (2, 4), (4, 5)]
-#myhash = lambda a: (a[1] + 10) // 3
-#sorthash = lambda a: a[1]
+class BSTNode:
+    def __init__(self, key, p = None, l = None, r = None):
+        self.key = key
+        self.p = p
+        self.l = l
+        self.r = r
+    
+class BST:
+    def __init__(self, head = None, myhash = lambda a: a):
+        self.head = head
+        self.myhash = myhash
 
-#mycmp = lambda a: a[1]
-#A = [-5,1,10,14,2,17,13,6,5,7,12,-3,-2,-1,-2,-3,0,3,2,-4,9,10,8]
-#print(myCountingSort(A, 20, -5))
+    def root(self):
+        return self.head
 
-#B = [(i, val) for i, val in enumerate(A)]
-#print(myCountingSort(B, (99, 20), (99, -5), mycmp))
+    def insert(self, key):
+        prevNode, curNode = None, self.head
+        while(curNode):
+            prevNode = curNode
+            if(self.myhash(key) <= self.myhash(curNode.key)):
+                curNode = curNode.l
+            else:
+                curNode = curNode.r
+        if(not prevNode): 
+            self.head = BSTNode(key)
+        elif(self.myhash(key) <= self.myhash(prevNode.key)):
+            prevNode.l = BSTNode(key, prevNode)
+        else:
+            prevNode.r = BSTNode(key, prevNode)
 
-#B = [(99, i) for i in A]
+    # return None if the key doesn't exist, return the BSTNode if found.
+    def search(self, key):
+        n = self.head
+        while(n):
+            if(n.key == key): return n
+            elif(self.myhash(key) <= self.myhash(n.key)): n = n.l
+            else: n = n.r
+        return None
+
+    def successor(self, node):
+        if(not node): return None
+        if(node.r): 
+            lMost = node.r
+            while(lMost.l): lMost = lMost.l
+            return lMost
+        while(node.p and node.p.r == node):
+            node = node.p
+        return node.p
+
+    # replace BSTNode a with b.
+    # note: it not only replace a on itself, but also its subtrees.
+    def replaceNode(self, a, b):
+        if(not a): return
+        elif(not a.p): self.head = b
+        elif(a.p.l == a): a.p.l = b
+        else: a.p.r = b
+        if(b): b.p = a.p
+
+    # if key doesn't exist, do nothing. Otherwise, remove the first node with 
+    # the corresponding key
+    def remove(self, key):
+        nextNode, targetNode = None, self.search(key)
+        if(not targetNode): return
+        if(not targetNode.r): nextNode = targetNode.l
+        elif(not targetNode.l): nextNode = targetNode.r
+        else:
+            nextNode = self.successor(targetNode)
+            self.replaceNode(nextNode, nextNode.r)
+            nextNode.l, nextNode.r = targetNode.l, targetNode.r
+            nextNode.l.p = nextNode
+            # if nextNode == targetNode.r, then after self.replaceNode(nextNode, nextNode.r)
+            # targetNode.r can be None if nextNode.r is None. Hence the validity check of 
+            # nextNode.r
+            if(nextNode.r): nextNode.r.p = nextNode
+        self.replaceNode(targetNode, nextNode)
+
+    # returns a list of elements in order
+    def inorderList(self):
+        res = []
+        def helper(n):
+            if(not n): return
+            helper(n.l)
+            res.append(n.key)
+            helper(n.r)
+        helper(self.head)
+        return res
+
+    def __str__(self):
+        return str(self.inorderList())
 
 
 
-#print(myCountingSort(B, (99, 20), (99, -5), mycmp))
 
-#C = [(99, 0) for i in A]
-#print(myCountingSort(C, (99, 0), (99, 0), mycmp))
+    
+b = BST()
 
-#C = [(99, -4) for i in A]
-#print(myCountingSort(C, (99, -4), (99, -4), mycmp))
-
-#C = [(99, 1) for i in A]
-#print(myCountingSort(C, (99, 1), (99, 1), mycmp))
-
-#C = [-3 for i in A]
-#print(myCountingSort(C, -3, -3))
-
-#print(myCountingSort([], -3, -3))
-
-
-#A = [-5,1,10,14,2,17,13,6,5,7,12,-3,-2,-1,-2,-3,0,3,2,-4,9,10,8]
-#myhashLst = getDecimalHashLst(-100)
-#print(radixSort(A, 9, 0, myhashLst))
-##[-5, -4, -3, -3, -2, -2, -1, 0, 1, 2, 2, 3, 5, 6, 7, 8, 9, 10, 10, 12, 13, 14, 17]
-
-
-#B = ["COW", "DOG", "SEA", "RUG", "ROW", "MOB", "BOX", "TAB", "BAR", "EAR", "TAR", "DIG", "BIG", "TEA", "NOW", "FOX"]
-#myhashLst = [lambda a, i=i: ord(a[i]) for i in range(2, -1, -1)]
-#print(radixSort(B, ord('Z'), ord('A'), myhashLst))
-##['BAR', 'BIG', 'BOX', 'COW', 'DIG', 'DOG', 'EAR', 'FOX', 'MOB', 'NOW', 'ROW', 'RUG', 'SEA', 'TAB', 'TAR', 'TEA']
-
-#C = [(5, 2), (4, 3), (6, 9), (11, 5), (2, 4), (4, 5)]
-#myhashLst = [lambda a, i=i: a[i] for i in range(1, -1, -1)]
-#print(radixSort(C, 20, 2, myhashLst))
-##[(2, 4), (4, 3), (4, 5), (5, 2), (6, 9), (11, 5)]
-
+A = []
+n = 500
+print("started")
+for i in range(n):
+    A.append(random.randint(0, 1000))
+print("A:******************")
+print(A)
+for a in A:
+    b.insert(a)
+    #print(a, b)
+for i in range(n):
+    j = random.randint(0, n - 1)
+    A[j], A[n - j - 1] = A[n - j - 1], A[j]
+print("A:******************")
+print(A)
+for a in A:
+    b.remove(a)
+    curB = b.inorderList()
+    for i in range(len(curB) - 1):
+        if(curB[i] > curB[i + 1]):
+            print("Error!!!! i = ", i)
+    #print(a)
+print("finished")
