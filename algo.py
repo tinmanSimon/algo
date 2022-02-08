@@ -151,6 +151,7 @@ class BST:
     def __init__(self, head = None, myhash = lambda a: a):
         self.head = head
         self.myhash = myhash
+        self.size = 0
 
     def root(self):
         return self.head
@@ -169,6 +170,7 @@ class BST:
             prevNode.l = BSTNode(key, prevNode)
         else:
             prevNode.r = BSTNode(key, prevNode)
+        self.size += 1
 
     # return None if the key doesn't exist, return the BSTNode if found.
     def search(self, key):
@@ -191,6 +193,9 @@ class BST:
 
     # replace BSTNode a with b.
     # note: it not only replace a on itself, but also its subtrees.
+    #       and this could potentially mess up with BST's size, so
+    #       it would be great to keep the size consistent when using
+    #       this method.
     def replaceNode(self, a, b):
         if(not a): return
         elif(not a.p): self.head = b
@@ -215,6 +220,7 @@ class BST:
             # nextNode.r
             if(nextNode.r): nextNode.r.p = nextNode
         self.replaceNode(targetNode, nextNode)
+        self.size -= 1
 
     # returns a list of elements in order
     def inorderList(self):
@@ -227,35 +233,104 @@ class BST:
         helper(self.head)
         return res
 
+    # height start from 1. so if you have only 1 item, it returns 1
+    # if BST is empty meaning self.head == None, then returns 0
+    def getHeight(self):
+        maxHeight, curHeight = 0, 1
+        prevNode, curNode = None, self.head
+        while(curNode):
+            maxHeight = max(maxHeight, curHeight)
+            prevNode, curPrevNode = curNode, prevNode
+            if(curNode.l and curNode.p == curPrevNode):
+                curNode = curNode.l
+                curHeight += 1
+            elif(curNode.r and curNode.r != curPrevNode):
+                curNode = curNode.r
+                curHeight += 1
+            elif(curNode.p):
+                curNode = curNode.p
+                curHeight -= 1
+            else: break
+        return maxHeight
+
+
+
     def __str__(self):
+        n, h = self.size, self.getHeight()
+        rowsPos = [0 for i in range(2 * h - 1)]
+        rowsStrs = ["" for i in range(2 * h - 1)]
+        curRow, curCol = 0, 0
+        
+        def helper(node, curRow, curCol):
+            if(not node): return [0, 0, 0]
+            keyStr = str(node.key)
+            keyStrLen = len(keyStr)
+            if(not node.l and not node.r):
+                rowsStrs[curRow] += (curCol - rowsPos[curRow]) * " " + keyStr
+                rowsPos[curRow] = len(rowsStrs[curRow])#curCol + len(str(node.key))
+                return [0, keyStrLen, 0]
+            l = helper(node.l, curRow + 2, curCol)
+            rowsStrs[curRow] += (curCol - rowsPos[curRow] + l[0] + l[1] + 1) * " " + keyStr
+            #if(l[1]): 
+            #    rowsStrs[curRow + 1] += (curCol - rowsPos[curRow] + l[0] + l[1]) * " " + "/"
+            rowsPos[curRow] = len(rowsStrs[curRow])# curCol + l[0] + l[1] + 1 + len(str(node.key))
+            if(keyStrLen < l[2]):
+               rowsStrs[curRow] += (l[2] - keyStrLen) * "_"
+               rowsPos[curRow] = len(rowsStrs[curRow])# (l[2] - len(str(node.key)))
+            if(l[1]): 
+                rowsStrs[curRow + 1] += (rowsPos[curRow] - rowsPos[curRow + 1] - keyStrLen - max(l[2] - keyStrLen, 0) - 1) * " " + "/"
+                rowsPos[curRow + 1] = len(rowsStrs[curRow + 1]) #curCol + l[0] + l[1] + 1
+            r = helper(node.r, curRow + 2, rowsPos[curRow] + 1)
+            rowsStrs[curRow] += r[0] * "_"
+            rowsPos[curRow] = len(rowsStrs[curRow])#r[0]
+            if(r[1]): 
+                rowsStrs[curRow + 1] += (rowsPos[curRow] - rowsPos[curRow + 1]) * " " + "\\"
+                rowsPos[curRow + 1] = len(rowsStrs[curRow + 1]) #rowsPos[curRow]
+
+            return [l[0] + l[1], l[2] + keyStrLen + r[0], r[1] + r[2]]
+
+        helper(self.head, 0, 0)
+
+        print("\n\n\nmat***********************************")
+        for lst in rowsStrs:
+            print("".join(lst))
+        print("mat***********************************")
         return str(self.inorderList())
 
+    
 
 
-
+print(" " + "/")
     
 b = BST()
 
 A = []
-n = 500
+n = 50
+randIntBottom, randIntTop = 0, 100
 print("started")
 for i in range(n):
-    A.append(random.randint(0, 1000))
+    A.append(random.randint(randIntBottom, randIntTop))
+
+#A = [5,4,4,5]
+A = [5, 59, 19, 36, 18, 40, 87, 49, 96, 67, 67, 88, 69, 75, 49, 97, 16, 48, 53, 93, 26, 52, 79, 72, 94, 23, 40, 15, 5, 60, 8, 44, 79, 26, 15, 44, 30, 58, 45, 87, 73, 11, 56, 58, 93, 48, 60, 1, 9, 96]
 print("A:******************")
 print(A)
 for a in A:
     b.insert(a)
     #print(a, b)
-for i in range(n):
-    j = random.randint(0, n - 1)
-    A[j], A[n - j - 1] = A[n - j - 1], A[j]
-print("A:******************")
-print(A)
-for a in A:
-    b.remove(a)
-    curB = b.inorderList()
-    for i in range(len(curB) - 1):
-        if(curB[i] > curB[i + 1]):
-            print("Error!!!! i = ", i)
-    #print(a)
+#for i in range(10 * n):
+#    j, k = random.randint(0, n - 1), random.randint(0, n - 1)
+#    A[j], A[k] = A[k], A[j]
+#print("A:******************")
+#print(A)
+
+print(b, b.size, b.getHeight())
+#for a in A:
+#    b.remove(a)
+#    curB = b.inorderList()
+#    for i in range(len(curB) - 1):
+#        if(curB[i] > curB[i + 1]):
+#            print("Error!!!! i = ", i)
+#    print(b, b.getHeight())
 print("finished")
+
