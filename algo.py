@@ -256,63 +256,53 @@ class BST:
 
 
     def __str__(self):
-        n, h = self.size, self.getHeight()
-        rowsPos = [0 for i in range(2 * h - 1)]
+        h = self.getHeight()
         rowsStrs = ["" for i in range(2 * h - 1)]
-        curRow, curCol = 0, 0
         
+        # return of helper is [leftLen, curLen, rightLen] where
+        #   leftLen = children length of left side
+        #   curLen = length of keyStr + length of "_" from both left side and right side
+        #   rightLen = children length of right side.
+        # But the point of helper is to construct rowsStrs so we get the representation
+        # of this BST.
         def helper(node, curRow, curCol):
             if(not node): return [0, 0, 0]
             keyStr = str(node.key)
             keyStrLen = len(keyStr)
-            if(not node.l and not node.r):
-                rowsStrs[curRow] += (curCol - rowsPos[curRow]) * " " + keyStr
-                rowsPos[curRow] = len(rowsStrs[curRow])#curCol + len(str(node.key))
-                return [0, keyStrLen, 0]
             l = helper(node.l, curRow + 2, curCol)
-            rowsStrs[curRow] += (curCol - rowsPos[curRow] + l[0] + l[1] + 1) * " " + keyStr
-            #if(l[1]): 
-            #    rowsStrs[curRow + 1] += (curCol - rowsPos[curRow] + l[0] + l[1]) * " " + "/"
-            rowsPos[curRow] = len(rowsStrs[curRow])# curCol + l[0] + l[1] + 1 + len(str(node.key))
-            if(keyStrLen < l[2]):
-               rowsStrs[curRow] += (l[2] - keyStrLen) * "_"
-               rowsPos[curRow] = len(rowsStrs[curRow])# (l[2] - len(str(node.key)))
+            rowsStrs[curRow] += (curCol -len(rowsStrs[curRow]) + l[0] + l[1] + 1) * " " + keyStr
+            if(keyStrLen < l[2] and (node.r or (node.p and node.p.l == node))): 
+                rowsStrs[curRow] += (l[2] - keyStrLen) * "_"
             if(l[1]): 
-                rowsStrs[curRow + 1] += (rowsPos[curRow] - rowsPos[curRow + 1] - keyStrLen - max(l[2] - keyStrLen, 0) - 1) * " " + "/"
-                rowsPos[curRow + 1] = len(rowsStrs[curRow + 1]) #curCol + l[0] + l[1] + 1
-            r = helper(node.r, curRow + 2, rowsPos[curRow] + 1)
+                rowsStrs[curRow + 1] += (len(rowsStrs[curRow + 2]) - len(rowsStrs[curRow + 1])) * " " + "/"
+            r = helper(node.r, curRow + 2, len(rowsStrs[curRow]) + 1)
             rowsStrs[curRow] += r[0] * "_"
-            rowsPos[curRow] = len(rowsStrs[curRow])#r[0]
             if(r[1]): 
-                rowsStrs[curRow + 1] += (rowsPos[curRow] - rowsPos[curRow + 1]) * " " + "\\"
-                rowsPos[curRow + 1] = len(rowsStrs[curRow + 1]) #rowsPos[curRow]
-
-            return [l[0] + l[1], l[2] + keyStrLen + r[0], r[1] + r[2]]
+                rowsStrs[curRow + 1] += (len(rowsStrs[curRow]) - len(rowsStrs[curRow + 1])) * " " + "\\"
+            return [l[0] + l[1] + 1, max(l[2] - keyStrLen, 0) + keyStrLen + r[0], r[1] + r[2] + 1]
 
         helper(self.head, 0, 0)
+        res = "\n".join(rowsStrs)
+        #print("\n\n\nStart of BST:****************************************")
+        #print(res)
+        #print("End of BST:****************************************")
+        #print("BST height: ", h, ", BST size: ", self.size)
 
-        print("\n\n\nmat***********************************")
-        for lst in rowsStrs:
-            print("".join(lst))
-        print("mat***********************************")
-        return str(self.inorderList())
+        return res
 
     
-
-
-print(" " + "/")
     
 b = BST()
 
 A = []
-n = 50
+n = 40
 randIntBottom, randIntTop = 0, 100
-print("started")
 for i in range(n):
     A.append(random.randint(randIntBottom, randIntTop))
 
 #A = [5,4,4,5]
-A = [5, 59, 19, 36, 18, 40, 87, 49, 96, 67, 67, 88, 69, 75, 49, 97, 16, 48, 53, 93, 26, 52, 79, 72, 94, 23, 40, 15, 5, 60, 8, 44, 79, 26, 15, 44, 30, 58, 45, 87, 73, 11, 56, 58, 93, 48, 60, 1, 9, 96]
+#A = [99, 88, 6, 59, 36, 61, 94, 53, 62, 100, 72, 32, 20, 82, 49, 66, 80, 22, 82, 56, 1, 84, 35, 22, 100, 56, 45, 70, 37, 84, 39, 23, 15, 94, 35, 19, 43, 21, 24, 45, 4, 46, 18, 62, 35, 78, 30, 77, 81, 98]
+#A = [99, 14, 23, 64, 49, 50, 15, 16, 41, 27, 5, 0, 22, 38, 66, 21, 67, 22, 35, 77, 61, 99, 65, 2, 97, 15, 100, 43, 23, 76, 75, 60, 13, 93, 37, 93, 93, 77, 45, 58, 16, 34, 97, 91, 94, 17, 69, 29, 28, 12, 28, 28, 61, 29, 18, 96, 93, 24, 92, 20, 98, 55, 64, 99, 3, 40, 17, 83, 87, 32, 45, 14, 22, 60, 51, 56, 38, 9, 9, 33, 16, 98, 47, 92, 60, 58, 39, 93, 11, 73, 16, 14, 18, 61, 56, 82, 83, 45, 35, 29]
 print("A:******************")
 print(A)
 for a in A:
@@ -324,7 +314,7 @@ for a in A:
 #print("A:******************")
 #print(A)
 
-print(b, b.size, b.getHeight())
+print(b)
 #for a in A:
 #    b.remove(a)
 #    curB = b.inorderList()
