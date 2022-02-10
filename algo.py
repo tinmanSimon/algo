@@ -302,18 +302,6 @@ class BST:
     # It just returns if x is None or y is None.
     # Otherwise, left rotate x with y.
     def leftRotateWithNode(self, node):
-        #if(not node or not node.r): return
-        #rnode = node.r
-        #node.r = rnode.l
-        #if(rnode.l): rnode.l.p = node
-        #rnode.l = node
-        #rnode.p = node.p
-        #if(node.p): 
-        #    if(node.p.l == node): node.p.l = rnode
-        #    else: node.p.r = rnode
-        #node.p = rnode
-        #if(node == self.head): self.head = rnode
-
         if(not node or not node.r): return
         rnode = node.r
         self.replaceNode(node, rnode)
@@ -330,18 +318,6 @@ class BST:
     #      /    ==>    \
     #     y             x
     def rightRotateWithNode(self, node):
-        #if(not node or not node.l): return
-        #lnode = node.l
-        #node.l = lnode.r
-        #if(lnode.r): lnode.r.p = node
-        #lnode.r = node
-        #lnode.p = node.p
-        #if(node.p): 
-        #    if(node.p.l == node): node.p.l = lnode
-        #    else: node.p.r = lnode
-        #node.p = lnode
-        #if(node == self.head): self.head = lnode
-
         if(not node or not node.l): return
         lnode = node.l
         self.replaceNode(node, lnode)
