@@ -142,11 +142,12 @@ def bucketSort(A, bucketsNum, myBucketHash, mySortHash = lambda a: a):
     return res
 
 class BSTNode:
-    def __init__(self, key, p = None, l = None, r = None):
+    def __init__(self, key, p = None, c = 0, l = None, r = None):
         self.key = key
         self.p = p
         self.l = l
         self.r = r
+        self.color = c
     
 class BST:
     def __init__(self, head = None, myhash = lambda a: a):
@@ -254,8 +255,6 @@ class BST:
             else: break
         return maxHeight
 
-
-
     def __str__(self):
         h = self.getHeight()
         rowsStrs = ["" for i in range(2 * h - 1)]
@@ -309,9 +308,7 @@ class BST:
         if(rnode.l): rnode.l.p = node
         rnode.l = node
         node.p = rnode
-
-
-
+        
     # Right rotate is similar to leftRotateWithNode,
     # but we are doing   
     #       x         y
@@ -343,6 +340,7 @@ for i in range(10 * len(A)):
     A[j], A[k] = A[k], A[j]
 #A = [99, 88, 6, 59, 36, 61, 94, 53, 62, 100, 72, 32, 20, 82, 49, 66, 80, 22, 82, 56, 1, 84, 35, 22, 100, 56, 45, 70, 37, 84, 39, 23, 15, 94, 35, 19, 43, 21, 24, 45, 4, 46, 18, 62, 35, 78, 30, 77, 81, 98]
 #A = [99, 14, 23, 64, 49, 50, 15, 16, 41, 27, 5, 0, 22, 38, 66, 21, 67, 22, 35, 77, 61, 99, 65, 2, 97, 15, 100, 43, 23, 76, 75, 60, 13, 93, 37, 93, 93, 77, 45, 58, 16, 34, 97, 91, 94, 17, 69, 29, 28, 12, 28, 28, 61, 29, 18, 96, 93, 24, 92, 20, 98, 55, 64, 99, 3, 40, 17, 83, 87, 32, 45, 14, 22, 60, 51, 56, 38, 9, 9, 33, 16, 98, 47, 92, 60, 58, 39, 93, 11, 73, 16, 14, 18, 61, 56, 82, 83, 45, 35, 29]
+A = [38, 37, 27, 92, 80, 51, 79, 34, 83, 56, 20, 100, 47, 60, 50, 88, 27, 66, 38, 72, 68, 3, 62, 12, 7, 44, 8, 22, 52, 35, 36, 79, 82, 86, 42, 13, 8, 13, 51, 58, 26, 68, 28, 39, 9, 30, 61, 69, 18, 20]
 print("A:******************")
 print(A)
 for a in A:
