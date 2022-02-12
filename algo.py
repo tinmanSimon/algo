@@ -142,7 +142,8 @@ def bucketSort(A, bucketsNum, myBucketHash, mySortHash = lambda a: a):
     return res
 
 class BSTNode:
-    def __init__(self, key, p = None, c = 0, l = None, r = None):
+    NOCOLOR, RED, BLACK = 0, 1, 2
+    def __init__(self, key, p = None, c = NOCOLOR, l = None, r = None):
         self.key = key
         self.p = p
         self.l = l
@@ -158,6 +159,11 @@ class BST:
     def root(self):
         return self.head
 
+    def sibling(self, node):
+        if(not node or not node.p): return None
+        if(node.p.l == node): return node.p.r
+        else: return node.p.l
+
     def insert(self, key):
         prevNode, curNode = None, self.head
         while(curNode):
@@ -166,13 +172,48 @@ class BST:
                 curNode = curNode.l
             else:
                 curNode = curNode.r
+        insertedNode = BSTNode(key, prevNode)
         if(not prevNode): 
-            self.head = BSTNode(key)
+            self.head = insertedNode
         elif(self.myhash(key) <= self.myhash(prevNode.key)):
-            prevNode.l = BSTNode(key, prevNode)
+            prevNode.l = insertedNode
         else:
-            prevNode.r = BSTNode(key, prevNode)
+            prevNode.r = insertedNode
         self.size += 1
+        return insertedNode
+
+    def RBInsert(self, key):
+        node = self.insert(key)
+        node.color = BSTNode.RED
+        while(node.p and node.p.color == BSTNode.RED):
+            # if node.p is RED, then node.p gotta have node.p.p
+            pSib = self.sibling(node.p)
+            # both parent and parent's sibling are RED
+            if(pSib and pSib.color == BSTNode.RED):
+                pSib.color, node.p.color = BSTNode.BLACK, BSTNode.BLACK
+                node.p.p.color = BSTNode.RED
+                node = node.p.p
+
+            # sibling is not RED, and node.p.p -> node.p has different 
+            # direction from node.p -> node, we make them same path.
+            elif(node.p.p.l == node.p and node.p.r == node):
+                self.leftRotateWithNode(node.p)
+                node = node.l
+            elif(node.p.p.r == node.p and node.p.l == node):
+                self.rightRotateWithNode(node.p)
+                node = node.r
+
+            # sibling is black or don't exist at all, and node.p.p -> node.p
+            # has the same direction from node.p -> node, then we rotate the
+            # node.p.p and reassign colors, then we should be done at here.
+            else:
+                node.p.color, node.p.p.color = BSTNode.BLACK, BSTNode.RED
+                if(node.p.p.l == node.p): 
+                    self.rightRotateWithNode(node.p.p)
+                else:
+                    self.leftRotateWithNode(node.p.p)
+        self.head.color = BSTNode.BLACK
+
 
     # return None if the key doesn't exist, return the BSTNode if found.
     def search(self, key):
@@ -268,6 +309,8 @@ class BST:
         def helper(node, curRow, curCol):
             if(not node): return [0, 0, 0]
             keyStr = str(node.key)
+            if(node.color): 
+                keyStr += ["R", "B"][node.color - 1]
             keyStrLen = len(keyStr)
             l = helper(node.l, curRow + 2, curCol)
             rowsStrs[curRow] += (curCol -len(rowsStrs[curRow]) + l[0] + l[1] + 1) * " " + keyStr
@@ -327,32 +370,39 @@ class BST:
     
     
 b = BST()
-
+c = BST()
 A = []
-n = 50
+n = 60
 randIntBottom, randIntTop = 1, 100
 for i in range(n):
-    A.append(random.randint(randIntBottom, randIntTop))
+    A.append(i)
+    #A.append(random.randint(randIntBottom, randIntTop))
     #letters = string.ascii_lowercase
     #A.append(''.join(random.choice(letters) for j in range(random.randint(randIntBottom, randIntTop))))
-for i in range(10 * len(A)):
+for i in range(1 * len(A)):
     j, k = random.randint(0, n - 1), random.randint(0, n - 1)
     A[j], A[k] = A[k], A[j]
 #A = [99, 88, 6, 59, 36, 61, 94, 53, 62, 100, 72, 32, 20, 82, 49, 66, 80, 22, 82, 56, 1, 84, 35, 22, 100, 56, 45, 70, 37, 84, 39, 23, 15, 94, 35, 19, 43, 21, 24, 45, 4, 46, 18, 62, 35, 78, 30, 77, 81, 98]
 #A = [99, 14, 23, 64, 49, 50, 15, 16, 41, 27, 5, 0, 22, 38, 66, 21, 67, 22, 35, 77, 61, 99, 65, 2, 97, 15, 100, 43, 23, 76, 75, 60, 13, 93, 37, 93, 93, 77, 45, 58, 16, 34, 97, 91, 94, 17, 69, 29, 28, 12, 28, 28, 61, 29, 18, 96, 93, 24, 92, 20, 98, 55, 64, 99, 3, 40, 17, 83, 87, 32, 45, 14, 22, 60, 51, 56, 38, 9, 9, 33, 16, 98, 47, 92, 60, 58, 39, 93, 11, 73, 16, 14, 18, 61, 56, 82, 83, 45, 35, 29]
-A = [38, 37, 27, 92, 80, 51, 79, 34, 83, 56, 20, 100, 47, 60, 50, 88, 27, 66, 38, 72, 68, 3, 62, 12, 7, 44, 8, 22, 52, 35, 36, 79, 82, 86, 42, 13, 8, 13, 51, 58, 26, 68, 28, 39, 9, 30, 61, 69, 18, 20]
+#A = [38, 37, 27, 92, 80, 51, 79, 34, 83, 56, 20, 100, 47, 60, 50, 88, 27, 66, 38, 72, 68, 3, 62, 12, 7, 44, 8, 22, 52, 35, 36, 79, 82, 86, 42, 13, 8, 13, 51, 58, 26, 68, 28, 39, 9, 30, 61, 69, 18, 20]
+#A = [70, 50, 90, 42, 73]
 print("A:******************")
 print(A)
 for a in A:
     b.insert(a)
-    #print(a, b)
+    c.RBInsert(a)
+    #print("insert: ", a)
+    #print(b, "\n\n")
+
+print("BST:\n", b, "\n\nRBT:\n", c)
+
 #for i in range(10 * n):
 #    j, k = random.randint(0, n - 1), random.randint(0, n - 1)
 #    A[j], A[k] = A[k], A[j]
 #print("A:******************")
 #print(A)
 
-print(b)
+#print(b)
 #for a in A:
 #    b.remove(a)
 #    curB = b.inorderList()
@@ -361,15 +411,5 @@ print(b)
 #            print("Error!!!! i = ", i)
 #    print(b, b.getHeight())
 
-b.rotateWithKey(A[0])
-print(b)
-b.rotateWithKey(A[1], False)
-print(b)
-b.rotateWithKey(A[2])
-print(b)
-b.rotateWithKey(A[3], False)
-print(b)
-b.rotateWithKey(A[4])
-print(b)
 print("finished")
 
